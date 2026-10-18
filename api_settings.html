@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>API Settings - StudyFlow</title>
+  <link rel="stylesheet" href="/static/styles.css">
+  <style>
+    .settings-group {
+      margin-bottom: 24px;
+      padding-bottom: 24px;
+      border-bottom: 1px solid #111;
+    }
+    .settings-group:last-child {
+      border-bottom: none;
+    }
+    .settings-group h3 {
+      margin: 0 0 16px 0;
+      font-size: 14px;
+      text-transform: uppercase;
+      color: #aaa;
+      font-weight: 600;
+    }
+    .form-group {
+      margin-bottom: 16px;
+    }
+    .api-status {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .api-status-item {
+      padding: 12px;
+      background: #111;
+      border-radius: 6px;
+      border-left: 3px solid #555;
+      font-size: 14px;
+    }
+    .api-status-item.enabled {
+      border-left-color: #4ade80;
+      background: rgba(74, 222, 128, 0.1);
+    }
+    .api-status-item.disabled {
+      border-left-color: #ef4444;
+      background: rgba(239, 68, 68, 0.1);
+    }
+    .api-status-item strong {
+      display: block;
+      margin-bottom: 4px;
+    }
+    .checkbox-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .checkbox-group input[type="checkbox"] {
+      cursor: pointer;
+      width: 18px;
+      height: 18px;
+    }
+    .checkbox-group label {
+      margin: 0;
+      cursor: pointer;
+      font-weight: 400;
+    }
+    .submit-btn {
+      background: #4a9eff;
+      color: #000;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 8px;
+    }
+    .submit-btn:hover {
+      background: #5aafff;
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header>
+      <div class="header-left">
+        <img src="/static/logo.svg" alt="StudyFlow logo" class="site-logo">
+        <div>
+          <h1>⚙️ API Settings</h1>
+          <p class="muted">Configure external service integrations</p>
+        </div>
+      </div>
+      <div class="header-right">
+        <div class="plus-menu">
+          <button class="menu-btn-plus" id="plus-btn" aria-label="Main menu">+</button>
+          <div class="menu-dropdown" id="plus-menu" aria-hidden="true">
+            <div class="menu-item"><a href="/">StudyFlow</a></div>
+            <div class="menu-item"><a href="/#add-task">Add task</a></div>
+            <div class="menu-item"><a href="/dashboard">Dashboard</a></div>
+            <div class="menu-item"><a href="/planner">Task Planner</a></div>
+            <div class="menu-item"><a href="/#study-timer">Study Timer</a></div>
+            <div class="menu-item"><a href="/account">Account</a></div>
+            <div class="menu-item"><a href="/logout">Sign out</a></div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div id="flash-container">
+          {% for category, msg in messages %}
+            <div class="flash {{ category }}">{{ msg }}</div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    <section class="card">
+      <h2>API Status</h2>
+      <div class="api-status">
+        <div class="api-status-item {% if api_status.google_oauth %}enabled{% else %}disabled{% endif %}">
+          <strong>Google OAuth</strong>
+          <span>{{ "✓ Configured" if api_status.google_oauth else "✗ Not set" }}</span>
+        </div>
+        <div class="api-status-item {% if api_status.sendgrid_email %}enabled{% else %}disabled{% endif %}">
+          <strong>Email (SendGrid)</strong>
+          <span>{{ "✓ Configured" if api_status.sendgrid_email else "✗ Not set" }}</span>
+        </div>
+        <div class="api-status-item {% if api_status.weather_api %}enabled{% else %}disabled{% endif %}">
+          <strong>Weather API</strong>
+          <span>{{ "✓ Configured" if api_status.weather_api else "✗ Not set" }}</span>
+        </div>
+        <div class="api-status-item {% if api_status.discord_webhook %}enabled{% else %}disabled{% endif %}">
+          <strong>Discord Webhook</strong>
+          <span>{{ "✓ Configured" if api_status.discord_webhook else "✗ Not set" }}</span>
+        </div>
+        <div class="api-status-item {% if api_status.openai %}enabled{% else %}disabled{% endif %}">
+          <strong>OpenAI</strong>
+          <span>{{ "✓ Configured" if api_status.openai else "✗ Not set" }}</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <form method="post" action="/settings/api">
+        <!-- Email Configuration -->
+        <div class="settings-group">
+          <h3>📧 Email Notifications</h3>
+          
+          <div class="form-group">
+            <label>Your Email Address</label>
+            <input type="email" name="email" placeholder="your@email.com" value="{{ user_email or '' }}">
+            <small style="color:#aaa;">Used for task reminders and notifications</small>
+          </div>
+          
+          <div class="checkbox-group">
+            <input type="checkbox" id="enable_email" name="enable_email_notifications" {% if enable_email %}checked{% endif %}>
+            <label for="enable_email">Enable email notifications</label>
+          </div>
+        </div>
+
+        <!-- Discord Configuration -->
+        <div class="settings-group">
+          <h3>💬 Discord Notifications</h3>
+          
+          <div class="form-group">
+            <label>Discord Webhook URL</label>
+            <input type="text" name="discord_webhook" placeholder="https://discord.com/api/webhooks/..." value="{{ user_discord or '' }}" style="font-family:monospace; font-size:0.9rem;">
+            <small style="color:#aaa;"><a href="https://discord.com/developers/docs/resources/webhook" target="_blank">How to create a webhook →</a></small>
+          </div>
+          
+          <div class="checkbox-group">
+            <input type="checkbox" id="enable_discord" name="enable_discord_notifications" {% if enable_discord %}checked{% endif %}>
+            <label for="enable_discord">Enable Discord notifications</label>
+          </div>
+        </div>
+
+        <!-- Location Configuration -->
+        <div class="settings-group">
+          <h3>📍 Location (for Weather)</h3>
+          
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+            <div class="form-group">
+              <label>Latitude</label>
+              <input type="number" name="latitude" step="0.0001" value="{{ user_latitude or '40.7128' }}" placeholder="40.7128">
+            </div>
+            <div class="form-group">
+              <label>Longitude</label>
+              <input type="number" name="longitude" step="0.0001" value="{{ user_longitude or '-74.0060' }}" placeholder="-74.0060">
+            </div>
+          </div>
+          <small style="color:#aaa;">Current location used for weather display on task days</small>
+        </div>
+
+        <!-- Feature Toggles -->
+        <div class="settings-group">
+          <h3>🔧 Feature Toggles</h3>
+          
+          <div class="checkbox-group">
+            <input type="checkbox" id="enable_weather" name="enable_weather_display" {% if enable_weather %}checked{% endif %}>
+            <label for="enable_weather">Show weather on task days</label>
+          </div>
+        </div>
+
+        <button type="submit" class="submit-btn">Save API Settings</button>
+      </form>
+    </section>
+
+    <div style="text-align: center; margin-top: 24px;">
+      <a href="/account" class="small-button">← Back to Account</a>
+    </div>
+  </div>
+
+  <script src="/static/main.js"></script>
+</body>
+</html>

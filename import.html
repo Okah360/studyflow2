@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Import Tasks - StudyFlow</title>
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+    <div class="page">
+        <header>
+            <div class="header-left">
+                <img src="/static/logo.svg" alt="StudyFlow logo" class="site-logo">
+                <div>
+                  <h1>Import Tasks</h1>
+                  <p class="muted">Upload a CSV exported from this app.</p>
+                </div>
+            </div>
+            <div class="header-right">
+                <a class="small-button" href="/">Back</a>
+            </div>
+        </header>
+
+        <section class="card">
+            <form action="/import" method="post" enctype="multipart/form-data">
+                <label>CSV file</label>
+                <input type="file" name="file" accept="text/csv">
+                <button type="submit">Upload and import</button>
+            </form>
+        </section>
+    </div>
+</body>
+</html>

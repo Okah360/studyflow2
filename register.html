@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Register - StudyFlow</title>
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+    <div class="page">
+        <header>
+            <div class="header-left">
+                <img src="/static/logo.svg" alt="StudyFlow logo" class="site-logo">
+                <div>
+                    <h1>Create account</h1>
+                    <p class="muted" style="margin:4px 0 0;">Start using StudyFlow today</p>
+                </div>
+            </div>
+        </header>
+
+        <section class="card">
+            <div class="hero-doodle" aria-hidden="true">
+                <svg viewBox="0 0 220 140" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="28" y="32" width="100" height="76" rx="12" stroke="#ffffff" stroke-width="2"/>
+                    <path d="M44 48h68" stroke="#ffffff" stroke-width="2" stroke-linecap="round"/>
+                    <path d="M44 64h44" stroke="#ffffff" stroke-width="2" stroke-linecap="round"/>
+                    <path d="M44 80h32" stroke="#ffffff" stroke-width="2" stroke-linecap="round"/>
+                    <circle cx="160" cy="54" r="20" stroke="#ffffff" stroke-width="2"/>
+                    <path d="M160 42v24" stroke="#ffffff" stroke-width="2" stroke-linecap="round"/>
+                    <path d="M148 54h24" stroke="#ffffff" stroke-width="2" stroke-linecap="round"/>
+                    <path d="M134 96c14-16 28-20 44-20" stroke="#ffffff" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+            </div>
+            <form action="/register" method="post">
+                <label>Username</label>
+                <input name="username" type="text" required>
+
+                <label>Password</label>
+                <input name="password" type="password" required>
+
+                <button type="submit" style="margin-top:12px;width:100%;"><svg class="icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 5v14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 12h14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg> Create account</button>
+            </form>
+        </section>
+    </div>
+</body>
+</html>

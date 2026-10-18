@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Task Planner - Study Planner</title>
+    <link rel="stylesheet" href="/static/styles.css">
+    <style>
+        .planner-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+        .week-navigation {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+        .week-navigation button {
+            padding: 6px 12px;
+            background: #444;
+            border: 1px solid #666;
+            color: #fff;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .week-navigation button:hover {
+            background: #555;
+        }
+        .week-display {
+            font-size: 14px;
+            color: #aaa;
+        }
+        .week-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+        .day-column {
+            background: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 12px;
+            min-height: 400px;
+            display: flex;
+            flex-direction: column;
+        }
+        .day-column.today {
+            border-color: #4a9eff;
+            box-shadow: 0 0 12px rgba(74, 158, 255, 0.2);
+        }
+        .day-header {
+            font-weight: 600;
+            font-size: 14px;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #333;
+        }
+        .day-header .day-name {
+            display: block;
+            color: #fff;
+        }
+        .day-header .day-num {
+            display: block;
+            font-size: 20px;
+            color: #4a9eff;
+        }
+        .day-column.today .day-header .day-num {
+            color: #4ade80;
+        }
+        .day-tasks {
+            flex: 1;
+            overflow-y: auto;
+        }
+        .task-item {
+            background: #2a2a2a;
+            border-left: 3px solid #4a9eff;
+            padding: 8px;
+            margin-bottom: 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .task-item:hover {
+            background: #333;
+            transform: translateX(2px);
+        }
+        .task-item.high {
+            border-left-color: #ff6b6b;
+        }
+        .task-item.medium {
+            border-left-color: #ffd966;
+        }
+        .task-item.low {
+            border-left-color: #70ad47;
+        }
+        .task-item.completed {
+            opacity: 0.6;
+            text-decoration: line-through;
+        }
+        .task-item-name {
+            font-weight: 500;
+            margin-bottom: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .task-item-meta {
+            font-size: 11px;
+            color: #999;
+            display: flex;
+            gap: 4px;
+        }
+        .unscheduled-section {
+            background: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 16px;
+            margin-top: 12px;
+        }
+        .unscheduled-section h3 {
+            margin: 0 0 12px 0;
+            font-size: 14px;
+        }
+        .unscheduled-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .unscheduled-task {
+            background: #2a2a2a;
+            border: 1px dashed #555;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            flex: 0 1 auto;
+            max-width: 150px;
+        }
+        .unscheduled-task:hover {
+            border-color: #4a9eff;
+        }
+        .add-task-btn {
+            background: #4a9eff;
+            color: #000;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 8px;
+            width: 100%;
+        }
+        .add-task-btn:hover {
+            background: #5aafff;
+        }
+    </style>
+</head>
+<body>
+    <div class="page">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div id="flash-container">
+                {% for category, msg in messages %}
+                    <div class="flash {{ category }}">{{ msg }}</div>
+                {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+        
+        <header>
+            <div class="header-left">
+                <img src="/static/logo.svg" alt="StudyFlow logo" class="site-logo">
+                <div>
+                  <h1>📅 Task Planner</h1>
+                  <p class="muted">Plan your week at a glance</p>
+                </div>
+            </div>
+            <div class="header-right">
+                <div class="plus-menu">
+                    <button class="menu-btn-plus" id="plus-btn" aria-label="Main menu">+</button>
+                    <div class="menu-dropdown" id="plus-menu" aria-hidden="true">
+                        <div class="menu-item"><a href="/#add-task">Add task</a></div>
+                        <div class="menu-item"><a href="/dashboard">Dashboard</a></div>
+                        <div class="menu-item"><a href="/#study-timer">Study Timer</a></div>
+                        {% if session.get('username') %}
+                            <div class="menu-item"><a href="/account">Account</a></div>
+                            <div class="menu-item"><a href="/logout">Sign out</a></div>
+                        {% else %}
+                            <div class="menu-item"><a href="/login">Sign in</a></div>
+                            <div class="menu-item"><a href="/register">Register</a></div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <div class="planner-header">
+            <div>
+                <h2 style="margin:0 0 4px 0;">{{ week_start.strftime('%B %Y') }}</h2>
+                <p class="muted" style="margin:0;">Week of {{ week_start.strftime('%B %d, %Y') }}</p>
+            </div>
+            <div class="week-navigation">
+                <a class="button-like-link" href="/planner?week_start={{ prev_week.isoformat() }}">← Prev week</a>
+                <a class="button-like-link" href="/planner">Today</a>
+                <a class="button-like-link" href="/planner?week_start={{ next_week.isoformat() }}">Next week →</a>
+            </div>
+        </div>
+
+        <div class="week-grid">
+            {% for day in week_days %}
+                <div class="day-column {% if day.is_today %}today{% endif %}">
+                    <div class="day-header">
+                        <span class="day-name">{{ day.name }}</span>
+                        <span class="day-num">{{ day.num }}</span>
+                    </div>
+                    <div class="day-tasks">
+                        {% set tasks = day_tasks.get(day.date, []) %}
+                        {% if tasks %}
+                            {% for task in tasks %}
+                                <div class="task-item {{ task.priority }} {% if task.complete %}completed{% endif %}" 
+                                     title="{{ task.name }}{% if task.notes %}: {{ task.notes }}{% endif %}">
+                                    <div class="task-item-name">{{ task.name }}</div>
+                                    <div class="task-item-meta">
+                                        <span>{{ task.priority }}</span>
+                                        {% if task.duration %}<span>{{ task.duration }}</span>{% endif %}
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        {% else %}
+                            <p class="muted" style="font-size: 12px; margin: 8px 0;">No tasks</p>
+                        {% endif %}
+                    </div>
+                    <a href="/#add-task" class="add-task-btn">+ Add task</a>
+                </div>
+            {% endfor %}
+        </div>
+
+        {% if unscheduled %}
+        <div class="unscheduled-section">
+            <h3>📌 Unscheduled Tasks ({{ unscheduled|length }})</h3>
+            <div class="unscheduled-list">
+                {% for task in unscheduled %}
+                    <div class="unscheduled-task {% if task.complete %}completed{% endif %}" 
+                         title="{{ task.name }}{% if task.notes %}: {{ task.notes }}{% endif %}">
+                        {{ task.name }}
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <div style="text-align: center; margin-top: 24px;">
+            <a href="/dashboard" class="small-button">← Back to Dashboard</a>
+        </div>
+    </div>
+
+    <script src="/static/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Dashboard - StudyFlow</title>
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+    <div class="page">
+        <header>
+            <div class="header-left">
+                <img src="/static/logo.svg" alt="StudyFlow logo" class="site-logo">
+                <div>
+                  <h1>StudyFlow Dashboard</h1>
+                  <p class="muted">Overview of your study progress</p>
+                </div>
+            </div>
+            <div class="header-right">
+                <div class="plus-menu">
+                    <button class="menu-btn-plus" id="plus-btn" aria-label="Main menu">+</button>
+                    <div class="menu-dropdown" id="plus-menu" aria-hidden="true">
+                        <div class="menu-item"><a href="/#add-task">Add task</a></div>
+                        <div class="menu-item"><a href="/planner">Task Planner</a></div>
+                        <div class="menu-item"><a href="/#study-timer">Study Timer</a></div>
+                        {% if session.get('username') %}
+                            <div class="menu-item"><a href="/account">Account</a></div>
+                            <div class="menu-item"><a href="/logout">Sign out</a></div>
+                        {% else %}
+                            <div class="menu-item"><a href="/login">Sign in</a></div>
+                            <div class="menu-item"><a href="/register">Register</a></div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <section class="card hero-card">
+            <div class="hero-copy">
+                <h3>Keep your study rhythm steady</h3>
+                <p class="muted">Plan ahead, track your progress, and stay calm with every study session.</p>
+            </div>
+            <div class="hero-doodle mini-doodle" aria-hidden="true">
+                <svg viewBox="0 0 220 140" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="34" y="28" width="98" height="72" rx="12" stroke="#ffffff" stroke-width="2"/>
+                    <rect x="48" y="40" width="28" height="10" rx="4" fill="#ffffff"/>
+                    <rect x="48" y="58" width="44" height="8" rx="4" fill="#ffffff" fill-opacity="0.75"/>
+                    <rect x="48" y="72" width="36" height="8" rx="4" fill="#ffffff" fill-opacity="0.6"/>
+                    <circle cx="162" cy="50" r="20" stroke="#ffffff" stroke-width="2"/>
+                    <path d="M160 34v32" stroke="#ffffff" stroke-width="2" stroke-linecap="round"/>
+                    <path d="M146 48h28" stroke="#ffffff" stroke-width="2" stroke-linecap="round"/>
+                    <path d="M132 96c10-16 24-22 42-22" stroke="#ffffff" stroke-width="2" stroke-linecap="round"/>
+                    <path d="M148 96c8-8 20-10 32-10" stroke="#ffffff" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+            </div>
+        </section>
+
+        <section class="card">
+            <div class="dashboard-grid">
+                <div class="dash-card">
+                    <h4>Total tasks</h4>
+                    <p><strong>{{ total }}</strong></p>
+                </div>
+                <div class="dash-card">
+                    <h4>Completed</h4>
+                    <p><strong>{{ completed }}</strong> <span class="muted">({{ progress }}%)</span></p>
+                </div>
+                <div class="dash-card">
+                    <h4>Pending</h4>
+                    <p><strong>{{ pending }}</strong></p>
+                </div>
+            </div>
+        </section>
+
+        <section class="card dashboard-chart">
+            <h3>Tasks for next 7 days</h3>
+            <svg class="dashboard-chart-svg" width="100%" height="60" viewBox="0 0 700 60" preserveAspectRatio="none">
+                {% set maxc = counts | map(attribute=1) | max if counts else 1 %}
+                {% for day,count in counts %}
+                    {% set x = loop.index0 * (700 / (counts|length)) %}
+                    {% set w = (700 / (counts|length)) - 6 %}
+                    {% set h = (count / (maxc if maxc>0 else 1)) * 48 %}
+                    <rect class="animated-bar" x="{{ x + 3 }}" y="{{ 56 - h }}" width="{{ w }}" height="{{ h }}" fill="currentColor"></rect>
+                {% endfor %}
+            </svg>
+            <p class="muted">Bars show number of tasks with a due date on each day.</p>
+        </section>
+
+        <section class="card">
+            <h3>Upcoming tasks (next 7 days)</h3>
+            {% if upcoming %}
+                <ul>
+                    {% for t in upcoming %}
+                        <li>{{ t['due_date'] or 'No date' }} — {{ t['name'] }} {% if t['complete'] %}(done){% endif %}</li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p class="muted">No upcoming tasks found.</p>
+            {% endif %}
+        </section>
+
+        <section class="card">
+            <h3>{{ month_name }} {{ year }}</h3>
+            <table class="calendar-table">
+                <thead>
+                    <tr>
+                        <th>Mon</th>
+                        <th>Tue</th>
+                        <th>Wed</th>
+                        <th>Thu</th>
+                        <th>Fri</th>
+                        <th>Sat</th>
+                        <th>Sun</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for week in month_matrix %}
+                        <tr>
+                        {% for day in week %}
+                            {% if day == 0 %}
+                                <td class="muted">&nbsp;</td>
+                            {% else %}
+                                {% set c = day_counts.get(day, 0) %}
+                                <td class="calendar-day {% if c > 0 %}task-day{% else %}empty-day{% endif %}">
+                                    <div class="day-number">{{ day }}</div>
+                                    {% if c > 0 %}
+                                        <div class="muted">{{ c }} task{{ 's' if c>1 else '' }}</div>
+                                    {% endif %}
+                                </td>
+                            {% endif %}
+                        {% endfor %}
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </section>
+    </div>
+
+    <script src="/static/main.js"></script>
+</body>
+</html>

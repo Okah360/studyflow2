@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Sign in - StudyFlow</title>
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+    <div class="page" style="max-width:420px;margin:80px auto;">
+        <header style="margin-bottom:20px;">
+            <div class="header-left">
+                <img src="/static/logo.svg" alt="StudyFlow logo" class="site-logo">
+                <div>
+                    <h1 style="margin:0; font-size:1.2rem;">StudyFlow</h1>
+                    <p class="muted" style="margin:4px 0 0;">Sign in to access your tasks</p>
+                </div>
+            </div>
+        </header>
+        <section class="card">
+            <div class="hero-doodle" aria-hidden="true">
+                <svg viewBox="0 0 220 140" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="34" y="32" width="96" height="70" rx="12" stroke="#ffffff" stroke-width="2"/>
+                    <path d="M48 48h68" stroke="#ffffff" stroke-width="2" stroke-linecap="round"/>
+                    <path d="M48 64h48" stroke="#ffffff" stroke-width="2" stroke-linecap="round"/>
+                    <path d="M48 80h32" stroke="#ffffff" stroke-width="2" stroke-linecap="round"/>
+                    <circle cx="164" cy="56" r="20" stroke="#ffffff" stroke-width="2"/>
+                    <path d="M164 44v24" stroke="#ffffff" stroke-width="2" stroke-linecap="round"/>
+                    <path d="M152 56h24" stroke="#ffffff" stroke-width="2" stroke-linecap="round"/>
+                    <path d="M136 96c12-14 28-18 44-18" stroke="#ffffff" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+            </div>
+            <form action="/login" method="post">
+                <label style="display:block;margin-bottom:6px;font-weight:600;">Username</label>
+                <input name="username" type="text" required autofocus>
+
+                <label style="display:block;margin-top:12px;margin-bottom:6px;font-weight:600;">Password</label>
+                <input name="password" type="password" required>
+
+                <button type="submit" style="margin-top:18px;width:100%;"><svg class="icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M15 3H21V9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M10 14L21 3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg> Sign in</button>
+            </form>
+            <div class="login-footer">
+                <details class="login-terms">
+                    <summary>Terms and conditions</summary>
+                    <p>StudyFlow is a personal study-planning tool. Keep your sign-in details private, and make sure any important deadlines are recorded somewhere you can access. You are responsible for the information you add to your account.</p>
+                </details>
+                <p class="login-signup">Don't have an account? <a class="button-like-link" href="/register">Sign up</a></p>
+            </div>
+        </section>
+    </div>
+</body>
+</html>

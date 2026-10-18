@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Account settings</title>
+  <link rel="stylesheet" href="/static/styles.css">
+  <style>
+    .settings-group {
+      margin-bottom: 24px;
+      padding-bottom: 24px;
+      border-bottom: 1px solid #111;
+    }
+    .settings-group:last-child {
+      border-bottom: none;
+    }
+    .settings-group h3 {
+      margin: 0 0 16px 0;
+      font-size: 14px;
+      text-transform: uppercase;
+      color: #aaa;
+      font-weight: 600;
+    }
+    .form-group {
+      margin-bottom: 16px;
+    }
+    .theme-toggle {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      margin-top: 12px;
+    }
+    .theme-option {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .theme-option input[type="radio"] {
+      cursor: pointer;
+    }
+    .theme-option label {
+      margin: 0;
+      cursor: pointer;
+      font-weight: 400;
+    }
+    .submit-btn {
+      background: #4a9eff;
+      color: #000;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 8px;
+    }
+    .submit-btn:hover {
+      background: #5aafff;
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header>
+      <div class="header-left">
+        <img src="/static/logo.svg" alt="StudyFlow logo" class="site-logo">
+        <div>
+          <h1>⚙️ Account settings</h1>
+          <p class="muted">Update your account details</p>
+        </div>
+      </div>
+      <div class="header-right">
+        <div class="plus-menu">
+          <button class="menu-btn-plus" id="plus-btn" aria-label="Main menu">+</button>
+          <div class="menu-dropdown" id="plus-menu" aria-hidden="true">
+            <div class="menu-item"><a href="/#add-task">Add task</a></div>
+            <div class="menu-item"><a href="/dashboard">Dashboard</a></div>
+            <div class="menu-item"><a href="/planner">Task Planner</a></div>
+            <div class="menu-item"><a href="/#study-timer">Study Timer</a></div>
+            <div class="menu-item"><a href="/logout">Sign out</a></div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div id="flash-container">
+          {% for category, msg in messages %}
+            <div class="flash {{ category }}">{{ msg }}</div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    <section class="card">
+      <form method="post" action="/account">
+        <!-- Profile Section -->
+        <div class="settings-group">
+          <h3>👤 Profile</h3>
+          
+          <div class="form-group">
+            <label>Full name</label>
+            <input type="text" name="name" placeholder="Enter your full name" value="{{ user_name or '' }}">
+          </div>
+          
+          <div class="form-group">
+            <label>Username</label>
+            <input type="text" name="username" placeholder="Enter your username" value="{{ session.get('username') or '' }}">
+          </div>
+        </div>
+
+        <!-- Security Section -->
+        <div class="settings-group">
+          <h3>🔒 Security</h3>
+          
+          <div class="form-group">
+            <label>New password</label>
+            <input type="password" name="password" placeholder="Leave blank to keep current">
+          </div>
+        </div>
+
+        <!-- Appearance Section -->
+        <div class="settings-group">
+          <h3>🎨 Appearance</h3>
+          
+          <div class="form-group">
+            <label>Theme</label>
+            <div class="theme-toggle">
+              <div class="theme-option">
+                <input type="radio" id="theme-dark" name="theme" value="dark" {% if user_theme == 'dark' %}checked{% endif %}>
+                <label for="theme-dark">🌙 Dark mode</label>
+              </div>
+              <div class="theme-option">
+                <input type="radio" id="theme-light" name="theme" value="light" {% if user_theme == 'light' %}checked{% endif %}>
+                <label for="theme-light">☀️ Light mode</label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <button type="submit" class="submit-btn">Save changes</button>
+      </form>
+    </section>
+
+    <div style="text-align: center; margin-top: 24px;">
+      <a href="/settings/api" class="small-button">API Settings →</a>
+      <a href="/dashboard" class="small-button">← Back to Dashboard</a>
+    </div>
+  </div>
+
+  <script src="/static/main.js"></script>
+  <script>
+    // Apply theme to page
+    function applyTheme(theme) {
+      if (theme === 'light') {
+        document.body.style.background = '#f5f5f5';
+        document.body.style.color = '#000';
+      } else {
+        document.body.style.background = '#000000';
+        document.body.style.color = '#fff';
+      }
+    }
+
+    // Load saved theme on page load
+    const savedTheme = document.querySelector('input[name="theme"]:checked').value;
+    applyTheme(savedTheme);
+
+    // Update theme preview when radio changes
+    document.querySelectorAll('input[name="theme"]').forEach(radio => {
+      radio.addEventListener('change', (e) => {
+        applyTheme(e.target.value);
+      });
+    });
+  </script>
+</body>
+</html>
