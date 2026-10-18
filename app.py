@@ -21,6 +21,9 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DB_PATH = os.environ.get("STUDY_DB_PATH", os.path.join(BASE_DIR, "study.db"))
 
 app = Flask(__name__, template_folder=os.path.join(os.path.dirname(os.path.abspath(__file__)), "templates"))
+print("APP LOCATION:", os.path.abspath(__file__))
+print("TEMPLATE FOLDER:", app.template_folder)
+print("TEMPLATE EXISTS:", os.path.exists(os.path.join(app.template_folder, "login.html")))
 
 # secret key for sessions - change to a secure random value for production
 app.config['SECRET_KEY'] = os.environ.get('STUDY_PLANNER_SECRET') or 'dev-secret-change-me'
